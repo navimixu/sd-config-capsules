@@ -1,3 +1,4 @@
+import pydantic 
 from pydantic import BaseModel, Field, ValidationError
 from urllib.parse import urlparse, parse_qs, urlunparse
 import requests, json, os
@@ -73,6 +74,10 @@ class GenMetadata(BaseModel):
     src: str = Field(default="")
     post_id: int = Field(default=0)
 
+
+    @classmethod
+    def get_tacked_props(cls):
+        return ["prompt", "neg_prompt", "cfg_scale", "steps", "seed", "height", "width", "sampling", "scheduler"]
  
     @classmethod
     def from_civi_api(cls, meta: dict):
@@ -288,7 +293,9 @@ class GenMetadata(BaseModel):
             return None
             #raise ValueError(f"Invalid data for ConfigData: {e}")
 
-META_PROPS = [field for field in GenMetadata.model_fields.keys() if field not in ["found_props"]]
+
+#META_PROPS = [field for field in GenMetadata.model_fields.keys() if field not in ["found_props"]]
+META_PROPS = GenMetadata.get_tacked_props()
 
 def request_from_civitai (url:str):
     res = ""
